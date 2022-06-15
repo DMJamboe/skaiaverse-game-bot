@@ -1,0 +1,14 @@
+{
+    "Blood": { "colour": "#85200c", "icon": "blood.png" },
+    "Breath": { "colour": "#9fc5e8", "icon": "breath.png" },
+    "Doom": { "colour": "#0c343d", "icon": "doom.png" },
+    "Hope": { "colour": "#f1c232", "icon": "hope.png" },
+    "Light": { "colour": "#ffd966", "icon": "light.png" },
+    "Life": { "colour": "#b6d7a8", "icon": "life.png" },
+    "Mind": { "colour": "#6aa84f", "icon": "mind.png" },
+    "Rage": { "colour": "#4c1130", "icon": "rage.png" },
+    "Heart": { "colour": "#c27ba0", "icon": "heart.png" },
+    "Space": { "colour": "#073763", "icon": "space.png" },
+    "Time": { "colour": "#85200c", "icon": "time.png" },
+    "Void": { "colour": "#20124d", "icon": "void.png" }
+}
