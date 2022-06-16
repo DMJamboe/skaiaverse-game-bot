@@ -36,8 +36,25 @@ async function firstDocument(collectionName, query) {
     return result;
 }
 
+async function deleteOneDocument(collectionName, query) {
+    try {
+        await client.connect();
+
+        const db = client.db(databaseName);
+        const coll = db.collection(collectionName);
+
+        result = await coll.deleteOne(query);
+    } finally {
+        await client.close();
+    }
+}
+
 module.exports = {
     COLLECTIONS: COLLECTIONS,
     insertDocument: insertDocument,
-    firstDocument: firstDocument
+    firstDocument: firstDocument,
+    deleteOneDocument: deleteOneDocument,
+    addCharacter: async (character) => { return insertDocument(COLLECTIONS.CHARACTER, character) },
+    findCharacter: async (query) => { return firstDocument(COLLECTIONS.CHARACTER, query) },
+    deleteCharacter: async (query) => { return deleteOneDocument(COLLECTIONS.CHARACTER, query) }
 }
