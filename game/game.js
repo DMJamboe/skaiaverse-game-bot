@@ -80,7 +80,7 @@ class Game {
     }
 
     // Method to play spell card
-    // 0: Success
+    // image: Success
     // 1: Invalid player
     // 2: Card not in hand
     playSpell(playerID, cardname, zone) {
@@ -116,6 +116,59 @@ class Game {
         player.grave.push(selectedCard);
         return card.cardInfo.image; // Returns image for bot to display (?)
     }
+
+    // Method to shuffle deck
+    shuffle(playerID) {
+        var player;
+        // Checks if player is in the game
+        for (p of this.players) {
+            if (p.user == playerID) {
+                player = p;
+            }
+        }
+        
+        if (!player) {
+            return 1;
+        }
+
+        var newdeck = shuffleArray(player.deck);
+        player.deck = newdeck;
+
+        return 0;
+    }
+
+    // Method to mulligan the deck
+    mulligan(playerID) {
+        var player;
+        // Checks if player is in the game
+        for (p of this.players) {
+            if (p.user == playerID) {
+                player = p;
+            }
+        }
+        
+        if (!player) {
+            return 1;
+        }
+
+        // Return hand to deck
+        for (let i = 0; i < player.hand.length; i++) {
+            let c = player.hand.pop();
+            player.deck.push(c);
+        }
+
+        // Shuffle deck
+        var newdeck = shuffleArray(player.deck);
+        player.deck = newdeck;
+
+        // Draw from top 5 times
+        for (let i = 0; i < 5; i++) {
+            let c = player.deck.pop();
+            player.hand.push(c);
+        }
+
+        return 0;
+    }
 }
 
 class Player{
@@ -129,4 +182,17 @@ class Player{
         this.maxenergy = 1;
         this.health = 25;
     }
+}
+
+/* Randomize array in-place using Durstenfeld shuffle algorithm */
+//https://stackoverflow.com/a/12646864
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+
+    return array;
 }
