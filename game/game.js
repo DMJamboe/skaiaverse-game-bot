@@ -1,3 +1,6 @@
+const Canvas = require('canvas');
+const fs = require('fs')
+
 class Game {
     constructor(player1, player2) {
         this.players = [new Player(player1), new Player(player2)];
@@ -200,7 +203,83 @@ function shuffleArray(array) {
     return array;
 }
 
-// Testing
+// Generate a card based on its json
+// TODO: add way to vertically squash long descriptions
+function makeCard(carddata) {
+    const canvas = Canvas.createCanvas(500, 500);
+    const context = canvas.getContext("2d");
+    // Load template from images
+    Canvas.loadImage("../images/" + carddata.aspect + "_Card_Template.jpg")
+        .then((template) => {
+            context.drawImage(template, 0, 0, canvas.width, canvas.height);
+            // Draw title
+            context.textAlign = "right";
+            context.font = '46px Georgia';
+            context.fillStyle = "#ffffff";
+            context.fillText(carddata.name.toUpperCase(), 478, 50, 330);
+            // Draw classifications
+            context.font = '40px Georgia';
+            context.fillStyle = "#000000";
+            let classes = carddata.classes.join(", ");
+            context.fillText(classes.toUpperCase(), 478, 90, 330);
+            // Draw energy
+            context.textAlign = "center";
+            context.fillStyle = "#d4af37";
+            context.fillText(carddata.cost["$numberInt"], 74, 72, 56);
+            // Draw range
+            context.font = '50px Georgia';
+            if (carddata.range) {
+                context.fillStyle = "#a32cc4";
+                context.fillText(carddata.range, 437, 453, 46);
+            } else {
+                // Health
+                context.fillStyle = "#dc143c";
+                context.fillText(carddata.health["$numberInt"], 439, 456, 46);
+                // Atk
+                context.fillStyle = "#5B5C5D";
+                context.fillText(carddata.attack["$numberInt"], 64, 456, 46);
+            }
+
+            context.font = '26px Georgia';
+            context.textAlign = "left";
+            context.fillStyle = "#000000";
+
+            // Split descriptions into lines
+            const boxSize = 433;
+            var coords = [33, 140];
+            var desc = carddata.text;
+            var descArray = desc.split(" ");
+            var lines = [];
+            var currentLine = "";
+            console.log(descArray);
+            while (descArray.length != 0) {
+                var nextWord = descArray.shift();
+                var newLine = currentLine.concat(" ", nextWord);
+                if (context.measureText(newLine).width > boxSize) {
+                    lines.push(currentLine.trim());
+                    descArray.unshift(nextWord);
+                    currentLine = "";
+                } else {
+                    currentLine = newLine;
+                }
+            }
+            lines.push(currentLine.trim());
+
+            for (var line of lines) {
+                context.fillText(line, coords[0], coords[1]);
+                coords[1] += 26;
+            }
+
+            const buffer = canvas.toBuffer("image/png");
+            fs.writeFileSync("./test.png", buffer);
+        }).catch(err => {
+            console.log(err);
+            return 1;
+        })
+    //canvas.toBuffer("image/png");
+}
+
+/* Testing
 var u1 = {id: 123, username: "Alex"};
 var u2 = {id: 274, username: "Sam"};
 var game = new Game(u1, u2);
@@ -222,3 +301,24 @@ console.log(game.players[0]);
 console.log(game.players[0]);
 game.shuffle(123);
 console.log(game.players[0]);
+*/
+
+/*fs.readFile("../images/" + carddata.aspect + "_Card_Template.jpg", (err, data) => {
+        if (err) {
+            return 1;
+        }
+        templateFile = data;
+    }) */
+
+var carddata = { "_id":{"$oid":"62ab3fbd1e90cf6a2e7c1ca0"},
+             "name":"One Trillion Lions",
+             "classes":["Denizen", "Spell", "Lion"],
+             "text":"One trillion!",
+             "cost":{"$numberInt":"999"},
+             "attack":{"$numberInt":"999"},
+             "health":{"$numberInt":"999"},
+             "range":null,
+             "aspect":"Breath",
+             "image":null };
+makeCard(carddata);
+
