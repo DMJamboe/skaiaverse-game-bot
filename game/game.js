@@ -214,34 +214,37 @@ function makeCard(carddata) {
             context.drawImage(template, 0, 0, canvas.width, canvas.height);
             // Draw title
             context.textAlign = "right";
-            context.font = '46px Georgia';
+            context.font = 'bold 50px Georgia';
             context.fillStyle = "#ffffff";
-            context.fillText(carddata.name.toUpperCase(), 478, 50, 330);
+            context.fillText(carddata.name.toUpperCase(), 478, 55, 330);
             // Draw classifications
-            context.font = '40px Georgia';
+            context.font = 'bold 36px Georgia';
             context.fillStyle = "#000000";
             //let classes = carddata.classes.join(", ");
-            context.fillText(carddata.classification.toUpperCase(), 478, 90, 330);
+            context.fillText(carddata.classification/*.toUpperCase()*/, 478, 92, 330);
             // Draw energy
+            context.font = 'bold 40px Georgia';
             context.textAlign = "center";
-            context.fillStyle = "#d4af37";
+            context.fillStyle = "#ffffff";
             context.fillText(carddata.cost, 74, 72, 56);
             // Draw range
-            context.font = '50px Georgia';
+            context.textBaseline = "middle";
             if (carddata.range) {
-                context.fillStyle = "#a32cc4";
-                context.fillText(carddata.range, 437, 453, 46);
+                context.font = 'bold 40px Georgia';
+                context.fillStyle = "#5604d9";
+                context.fillText(carddata.range, 437, 437, 46);
             } else {
+                context.font = 'bold 50px Georgia';
                 // Health
-                context.fillStyle = "#dc143c";
-                context.fillText(carddata.health, 439, 456, 46);
+                context.fillStyle = "#ff0000";
+                context.fillText(carddata.health, 437, 437, 46);
                 // Atk
                 context.fillStyle = "#3a3b3c";
-                context.fillText(carddata.attack, 64, 456, 46);
+                context.fillText(carddata.attack, 62, 437, 46);
             }
 
-            var descSize = 26;
-            var spaceSize = descSize * 1.5;
+            var descSize = 36;
+            var spaceSize = descSize;
             context.font = descSize + 'px Georgia';
             context.textAlign = "left";
             context.fillStyle = "#000000";
