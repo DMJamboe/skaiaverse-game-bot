@@ -209,7 +209,7 @@ function makeCard(carddata) {
     const canvas = Canvas.createCanvas(500, 500);
     const context = canvas.getContext("2d");
     // Load template from images
-    Canvas.loadImage("../images/" + carddata.aspect + "_Card_Template.jpg")
+    Canvas.loadImage("./images/" + carddata.aspect + "_Card_Template.jpg")
         .then((template) => {
             context.drawImage(template, 0, 0, canvas.width, canvas.height);
             // Draw title
@@ -220,12 +220,12 @@ function makeCard(carddata) {
             // Draw classifications
             context.font = '40px Georgia';
             context.fillStyle = "#000000";
-            let classes = carddata.classes.join(", ");
-            context.fillText(classes.toUpperCase(), 478, 90, 330);
+            //let classes = carddata.classes.join(", ");
+            context.fillText(carddata.classification.toUpperCase(), 478, 90, 330);
             // Draw energy
             context.textAlign = "center";
             context.fillStyle = "#d4af37";
-            context.fillText(carddata.cost["$numberInt"], 74, 72, 56);
+            context.fillText(carddata.cost, 74, 72, 56);
             // Draw range
             context.font = '50px Georgia';
             if (carddata.range) {
@@ -234,10 +234,10 @@ function makeCard(carddata) {
             } else {
                 // Health
                 context.fillStyle = "#dc143c";
-                context.fillText(carddata.health["$numberInt"], 439, 456, 46);
+                context.fillText(carddata.health, 439, 456, 46);
                 // Atk
                 context.fillStyle = "#3a3b3c";
-                context.fillText(carddata.attack["$numberInt"], 64, 456, 46);
+                context.fillText(carddata.attack, 64, 456, 46);
             }
 
             var descSize = 26;
@@ -332,5 +332,8 @@ var carddata = { "_id":{"$oid":"62ab3fbd1e90cf6a2e7c1ca0"},
              "range":null,
              "aspect":"Breath",
              "image":null };
-makeCard(carddata);
+// makeCard(carddata);
 
+module.exports = {
+    makeCard: makeCard
+}

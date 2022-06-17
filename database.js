@@ -48,6 +48,7 @@ async function deleteOneDocument(collectionName, query) {
     } finally {
         await client.close();
     }
+    return result;
 }
 
 async function replaceDocument(collectionName, filter, replacement) {
@@ -61,6 +62,35 @@ async function replaceDocument(collectionName, filter, replacement) {
     } finally {
         await client.close();
     }
+    return result;
+}
+
+async function fetchAll(collectionName, project) {
+    try {
+        await client.connect();
+
+        const db = client.db(dbName);
+        const coll = db.collection(collectionName);
+
+        result = await coll.find().project(project).toArray();
+    } finally {
+        await client.close();
+    }
+    return result;
+}
+
+async function fetchUnique(collectionName, field) {
+    try {
+        await client.connect();
+
+        const db = client.db(dbName);
+        const coll = db.collection(collectionName);
+
+        result = await coll.distinct(field);
+    } finally {
+        await client.close();
+    }
+    return result;
 }
 
 module.exports = {
@@ -74,5 +104,6 @@ module.exports = {
     deleteCharacter: async (query) => { return deleteOneDocument(COLLECTIONS.CHARACTER, query) },
     addCard: async (card) => { return insertDocument(COLLECTIONS.CARDS, card) },
     replaceCard: async (filter, card) => { return replaceDocument(COLLECTIONS.CARDS, filter, card) },
-    findCard: async (query) => { return firstDocument(COLLECTIONS.CARDS, query) }
+    findCard: async (query) => { return firstDocument(COLLECTIONS.CARDS, query) },
+    getCardNames: async (query) => { return fetchUnique(COLLECTIONS.CARDS, 'name') }
 }
