@@ -1,14 +1,14 @@
 {
-    "Blood": { "colour": "#85200c", "icon": "blood.png" },
-    "Breath": { "colour": "#9fc5e8", "icon": "breath.png" },
-    "Doom": { "colour": "#0c343d", "icon": "doom.png" },
-    "Hope": { "colour": "#f1c232", "icon": "hope.png" },
-    "Light": { "colour": "#ffd966", "icon": "light.png" },
-    "Life": { "colour": "#b6d7a8", "icon": "life.png" },
-    "Mind": { "colour": "#6aa84f", "icon": "mind.png" },
-    "Rage": { "colour": "#4c1130", "icon": "rage.png" },
-    "Heart": { "colour": "#c27ba0", "icon": "heart.png" },
-    "Space": { "colour": "#073763", "icon": "space.png" },
-    "Time": { "colour": "#85200c", "icon": "time.png" },
-    "Void": { "colour": "#20124d", "icon": "void.png" }
+    "Blood": { "colour": "#85200c", "icon": "blood.png", "title": "#ffffff", "text": "#000000" },
+    "Breath": { "colour": "#9fc5e8", "icon": "breath.png", "title": "#ffffff", "text": "#000000" },
+    "Doom": { "colour": "#0c343d", "icon": "doom.png", "title": "#ffffff", "text": "#000000" },
+    "Hope": { "colour": "#f1c232", "icon": "hope.png", "title": "#ffffff", "text": "#000000" },
+    "Light": { "colour": "#ffd966", "icon": "light.png", "title": "#ffffff", "text": "#000000" },
+    "Life": { "colour": "#b6d7a8", "icon": "life.png", "title": "#ffffff", "text": "#000000" },
+    "Mind": { "colour": "#6aa84f", "icon": "mind.png", "title": "#ffffff", "text": "#000000" },
+    "Rage": { "colour": "#4c1130", "icon": "rage.png", "title": "#ffffff", "text": "#000000" },
+    "Heart": { "colour": "#c27ba0", "icon": "heart.png", "title": "#ffffff", "text": "#000000" },
+    "Space": { "colour": "#073763", "icon": "space.png", "title": "#ffffff", "text": "#000000" },
+    "Time": { "colour": "#85200c", "icon": "time.png", "title": "#ffffff", "text": "#000000" },
+    "Void": { "colour": "#20124d", "icon": "void.png", "title": "#ffffff", "text": "#000000" }
 }
