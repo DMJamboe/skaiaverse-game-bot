@@ -11,8 +11,6 @@ class Game {
         this.turn = 1
     }
 
-    // UNTESTED METHODS
-
     // Method to draw from deck
     // 0: Success
     // 1: Invalid Player
@@ -20,7 +18,7 @@ class Game {
     draw(playerID) {
         var player;
         // Checks if player is in the game
-        for (p of this.players) {
+        for (var p of this.players) {
             if (p.user == playerID) {
                 player = p;
             }
@@ -30,7 +28,7 @@ class Game {
             return 1;
         }
 
-        if (deck.length == 0) {
+        if (player.deck.length == 0) {
             return 2;
         }
 
@@ -47,7 +45,7 @@ class Game {
     playToBoard(playerID, cardname, zone) {
         var player;
         // Checks if player is in the game
-        for (p of this.players) {
+        for (var p of this.players) {
             if (p.user == playerID) {
                 player = p;
             }
@@ -59,8 +57,10 @@ class Game {
 
         var selectedCard;
         var index;
-        for (card in player.hand) {
-            if (cardname == card.name) {
+        for (var card of player.hand) {
+            // TEMPORARY CHANGE FOR TESTING CARDS
+            //if (cardname == card.name) { 
+            if (cardname == card) {
                 selectedCard = card;
                 index = player.hand.indexOf(card);
             }
@@ -86,7 +86,7 @@ class Game {
     playSpell(playerID, cardname, zone) {
         var player;
         // Checks if player is in the game
-        for (p of this.players) {
+        for (var p of this.players) {
             if (p.user == playerID) {
                 player = p;
             }
@@ -98,8 +98,10 @@ class Game {
 
         var selectedCard;
         var index;
-        for (card in player.hand) {
-            if (cardname == card.name) {
+        for (var card of player.hand) {
+            // TEMPORARY CHANGE FOR TESTING CARDS
+            //if (cardname == card.name) { 
+            if (cardname == card) {
                 selectedCard = card;
                 index = player.hand.indexOf(card);
             }
@@ -114,14 +116,15 @@ class Game {
         player.hand.splice(index, 1);
         // Pushes card to grave
         player.grave.push(selectedCard);
-        return card.cardInfo.image; // Returns image for bot to display (?)
+        return 0;
+        //return card.cardInfo.image; // Returns image for bot to display (?)
     }
 
     // Method to shuffle deck
     shuffle(playerID) {
         var player;
         // Checks if player is in the game
-        for (p of this.players) {
+        for (var p of this.players) {
             if (p.user == playerID) {
                 player = p;
             }
@@ -141,7 +144,7 @@ class Game {
     mulligan(playerID) {
         var player;
         // Checks if player is in the game
-        for (p of this.players) {
+        for (var p of this.players) {
             if (p.user == playerID) {
                 player = p;
             }
@@ -196,3 +199,26 @@ function shuffleArray(array) {
 
     return array;
 }
+
+// Testing
+var u1 = {id: 123, username: "Alex"};
+var u2 = {id: 274, username: "Sam"};
+var game = new Game(u1, u2);
+game.players[0].deck = ["Flume Knight", "Toothpaste", "Teleport", "Swift Attack", "Atrioc's Gambit"];
+// Testing draw
+game.draw(123);
+game.draw(123);
+console.log(game.players[0]);
+// Testing play to board
+console.log(game.playToBoard(123, "Swift Attack", "z2"));
+console.log(game.playToBoard(321, "Swift Attack", "z2"));
+console.log(game.playToBoard(274, "Swift Attack", "z2"));
+console.log(game.players[0]);
+console.log(game.board);
+// Testing play as spell
+console.log(game.playSpell(123, "Atrioc's Gambit"));
+console.log(game.players[0]);
+// Testing shuffle
+console.log(game.players[0]);
+game.shuffle(123);
+console.log(game.players[0]);
