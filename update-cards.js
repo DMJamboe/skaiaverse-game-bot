@@ -48,7 +48,9 @@ if (!argv.d) {
                 for (const card of parsedCards) {
                     pbar.update(payload = {task: `Searching ${card.name}`});
                     checkCard = await db.findCard({"name": card.name});
-                    delete checkCard._id;
+                    if (checkCard && checkCard._id) {
+                        delete checkCard._id;
+                    }
                     if (JSON.stringify(card) === JSON.stringify(checkCard)) {
                         pbar.update(payload = {task: `Ignoring ${card.name}`});
                         ignore += 1;
@@ -63,6 +65,7 @@ if (!argv.d) {
                     }
                     pbar.increment();
                 };
+                pbar.update(payload = {task: `Complete`});
                 pbar.stop();
                 console.log(`\nInserted ${inserts} cards.\nUpdated  ${updates} cards.\nIgnored  ${ignore} cards.\nFailed   ${fails} cards.`);
             }).catch((err) => {
