@@ -236,37 +236,58 @@ function makeCard(carddata) {
                 context.fillStyle = "#dc143c";
                 context.fillText(carddata.health, 439, 456, 46);
                 // Atk
-                context.fillStyle = "#5B5C5D";
+                context.fillStyle = "#3a3b3c";
                 context.fillText(carddata.attack, 64, 456, 46);
             }
 
-            context.font = '26px Georgia';
+            var descSize = 26;
+            var spaceSize = descSize * 1.5;
+            context.font = descSize + 'px Georgia';
             context.textAlign = "left";
             context.fillStyle = "#000000";
+            context.textBaseline = "top";
 
             // Split descriptions into lines
-            const boxSize = 433;
-            var coords = [33, 140];
-            var desc = carddata.text;
-            var descArray = desc.split(" ");
-            var lines = [];
-            var currentLine = "";
-            while (descArray.length != 0) {
-                var nextWord = descArray.shift();
-                var newLine = currentLine.concat(" ", nextWord);
-                if (context.measureText(newLine).width > boxSize) {
-                    lines.push(currentLine.trim());
-                    descArray.unshift(nextWord);
-                    currentLine = "";
-                } else {
-                    currentLine = newLine;
+            var cont = true;
+            while (cont) {
+                const boxSize = 419;
+                var coords = [40, 120];
+                var desc = carddata.text;
+                var descArray = desc.split(" ");
+                var lines = [];
+                var currentLine = "";
+                console.log(descArray);
+                // Splits each line when it would overflow the box
+                while (descArray.length != 0) {
+                    var nextWord = descArray.shift();
+                    var newLine = currentLine.concat(" ", nextWord);
+                    if (context.measureText(newLine).width > boxSize) {
+                        if (currentLine == "") {
+                            break;
+                        }
+                        lines.push(currentLine.trim());
+                        descArray.unshift(nextWord);
+                        currentLine = "";
+                    } else {
+                        currentLine = newLine;
+                    }
+                }
+                lines.push(currentLine.trim());
+                console.log(lines.length);
+                // Checks whether the lines fit in the box vertically
+                if (lines.length > (boxSize / descSize) / 2) {
+                    descSize = descSize-1;
+                    context.font = descSize + 'px Georgia';
+                    spaceSize = descSize;
+                } else { 
+                    cont = false;
                 }
             }
-            lines.push(currentLine.trim());
 
+            // Writes to image
             for (var line of lines) {
                 context.fillText(line, coords[0], coords[1]);
-                coords[1] += 26;
+                coords[1] += spaceSize;
             }
 
             const buffer = canvas.toBuffer("image/png");
@@ -275,7 +296,6 @@ function makeCard(carddata) {
             console.log(err);
             return 1;
         })
-    //canvas.toBuffer("image/png");
 }
 
 /* Testing
@@ -301,25 +321,6 @@ console.log(game.players[0]);
 game.shuffle(123);
 console.log(game.players[0]);
 */
-
-/*fs.readFile("../images/" + carddata.aspect + "_Card_Template.jpg", (err, data) => {
-        if (err) {
-            return 1;
-        }
-        templateFile = data;
-    }) */
-
-var carddata = { "_id":{"$oid":"62ab3fbd1e90cf6a2e7c1ca0"},
-             "name":"One Trillion Lions",
-             "classes":["Denizen", "Spell", "Lion"],
-             "text":"One trillion!",
-             "cost":{"$numberInt":"999"},
-             "attack":{"$numberInt":"999"},
-             "health":{"$numberInt":"999"},
-             "range":null,
-             "aspect":"Breath",
-             "image":null };
-// makeCard(carddata);
 
 module.exports = {
     makeCard: makeCard
