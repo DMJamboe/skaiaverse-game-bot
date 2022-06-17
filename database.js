@@ -1,9 +1,10 @@
 const { MongoClient } = require('mongodb');
 const { dbURL } = require('./config.json');
 
-const databaseName = "testing";
+const { dbName } = require('./config.json');
 const COLLECTIONS = {
-    CHARACTER: "characters"
+    CHARACTER: "characters",
+    CARDS: "cards"
 }
 
 const client = new MongoClient(dbURL);
@@ -12,7 +13,7 @@ async function insertDocument(collectionName, document) {
     try {
         await client.connect();
 
-        const db = client.db(databaseName);
+        const db = client.db(dbName);
         const coll = db.collection(collectionName);
 
         await coll.insertOne(document);
@@ -26,7 +27,7 @@ async function firstDocument(collectionName, query) {
     try {
         await client.connect();
 
-        const db = client.db(databaseName);
+        const db = client.db(dbName);
         const coll = db.collection(collectionName);
 
         result = await coll.findOne(query);
@@ -40,10 +41,23 @@ async function deleteOneDocument(collectionName, query) {
     try {
         await client.connect();
 
-        const db = client.db(databaseName);
+        const db = client.db(dbName);
         const coll = db.collection(collectionName);
 
         result = await coll.deleteOne(query);
+    } finally {
+        await client.close();
+    }
+}
+
+async function replaceDocument(collectionName, filter, replacement) {
+    try {
+        await client.connect();
+
+        const db = client.db(dbName);
+        const coll = db.collection(collectionName);
+
+        result = await coll.replaceOne(filter, replacement);
     } finally {
         await client.close();
     }
@@ -54,7 +68,11 @@ module.exports = {
     insertDocument: insertDocument,
     firstDocument: firstDocument,
     deleteOneDocument: deleteOneDocument,
+    replaceDocument: replaceDocument,
     addCharacter: async (character) => { return insertDocument(COLLECTIONS.CHARACTER, character) },
     findCharacter: async (query) => { return firstDocument(COLLECTIONS.CHARACTER, query) },
-    deleteCharacter: async (query) => { return deleteOneDocument(COLLECTIONS.CHARACTER, query) }
+    deleteCharacter: async (query) => { return deleteOneDocument(COLLECTIONS.CHARACTER, query) },
+    addCard: async (card) => { return insertDocument(COLLECTIONS.CARDS, card) },
+    replaceCard: async (filter, card) => { return replaceDocument(COLLECTIONS.CARDS, filter, card) },
+    findCard: async (query) => { return firstDocument(COLLECTIONS.CARDS, query) }
 }
