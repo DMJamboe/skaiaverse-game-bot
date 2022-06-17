@@ -245,12 +245,13 @@ function makeCard(carddata) {
             context.font = descSize + 'px Georgia';
             context.textAlign = "left";
             context.fillStyle = "#000000";
+            context.textBaseline = "top";
 
             // Split descriptions into lines
             var cont = true;
             while (cont) {
-                const boxSize = 433;
-                var coords = [33, 140];
+                const boxSize = 419;
+                var coords = [40, 120];
                 var desc = carddata.text;
                 var descArray = desc.split(" ");
                 var lines = [];
@@ -295,7 +296,6 @@ function makeCard(carddata) {
             console.log(err);
             return 1;
         })
-    //canvas.toBuffer("image/png");
 }
 
 /* Testing
@@ -321,18 +321,6 @@ console.log(game.players[0]);
 game.shuffle(123);
 console.log(game.players[0]);
 */
-
-var carddata = { "_id":{"$oid":"62ab3fbd1e90cf6a2e7c1ca0"},
-             "name":"One Trillion Lions",
-             "classes":["Denizen", "Spell", "Lion"],
-             "text":"Lorem ipsum dLorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-             "cost":{"$numberInt":"999"},
-             "attack":{"$numberInt":"999"},
-             "health":{"$numberInt":"999"},
-             "range":null,
-             "aspect":"Breath",
-             "image":null };
-// makeCard(carddata);
 
 module.exports = {
     makeCard: makeCard
