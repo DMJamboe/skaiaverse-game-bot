@@ -7,14 +7,14 @@ class Game {
         this.players = [new Player(player1), new Player(player2)];
         this.board = {
             z1: [],
-            z2: [this.players[0], this.players[0], this.players[0], this.players[0], this.players[0], this.players[0], this.players[0]],
+            z2: [this.players[0]],
             z3: [],
             z4: [this.players[1]],
             z5: []
           }
         this.turn = 1;
-        this.init();
-        this.renderGame();
+        /*this.init();
+        this.renderGame();*/
     }
 
     // Initialises the game
@@ -110,12 +110,15 @@ class Game {
             return 1;
         }
 
+        
         var selectedCard;
         var index;
         for (var card of player.hand) {
             // TEMPORARY CHANGE FOR TESTING CARDS
             //if (cardname == card.name) { 
-            if (cardname == card) {
+            console.log(cardname);
+            console.log(card.name);
+            if (cardname == card.name) {
                 selectedCard = card;
                 index = player.hand.indexOf(card);
             }
@@ -407,11 +410,16 @@ async function renderPlayer(player) {
         };
 }
 
-// 
-var u1 = {id: "567732334367998004", username: "Alex"};
-var u2 = {id: "567732334367998004", username: "Sam"};
-var game = new Game(u1, u2);
-//console.log(game.players[0].constructor.name);
+/*
+let u1 = {id: "567732334367998004", username: "Alex"};
+let u2 = {id: "567732334367998004", username: "Sam"};
+let game = new Game(u1, u2);
+game.init().then(() => {
+    console.log(game.players[1].hand[1]);
+    console.log(game.playToBoard("567732334367998004", game.players[1].hand[1].name, "z2"));
+    game.renderGame();
+});*/
+
 
 module.exports = {
     makeCard: makeCard
