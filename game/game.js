@@ -7,7 +7,7 @@ class Game {
         this.players = [new Player(player1), new Player(player2)];
         this.board = {
             z1: [],
-            z2: [this.players[0]],
+            z2: [this.players[0], this.players[0], this.players[0], this.players[0], this.players[0], this.players[0], this.players[0]],
             z3: [],
             z4: [this.players[1]],
             z5: []
@@ -39,24 +39,26 @@ class Game {
                 context.fillStyle = "white";
                 context.fillRect(0, 0, 1000, 50);
                 context.fillRect(0, 1150, 1000, 50);
+                context.lineWidth = 2;
+                context.strokeRect(0, 50, 1000, 0);
+                context.strokeRect(0, 1150, 1000, 0);
                 for (const [zone, cards] of Object.entries(this.board)) {
                     console.log(1);
                     var x = baseX;
                     for (var card of cards) {
                         if (card.constructor.name == "Player") {
-                            var img = renderPlayer(card);
+                            var img = await renderPlayer(card);
                         } else {
-                            var img = makeCard(card);
+                            var img = await makeCard(card);
                         }
-                        img.then((result) => {
-                            console.log(result);
-                            context.drawImage(result, x, zones[zone], 200, 200);
-                            x += xScale;
-                        });
+                        context.drawImage(img, x, zones[zone], 200, 200);
+                        context.strokeRect(x, zones[zone], 200, 200);
+                        x += xScale;
                     }
                 }
                 const buffer = canvas.toBuffer("image/png");
                 fs.writeFileSync("./board.png", buffer);
+                console.log("rendered");
                 return canvas;
             }).catch(err => {
                 console.log(err);
@@ -388,22 +390,17 @@ async function renderPlayer(player) {
     context.fillRect(0, 0, 500 , 500);
     context.fillStyle = "#000000";
     try {
-        let template = await Canvas.loadImage("../images/spirograph.png") // change path
-        context.drawImage(template, 0, 0, 150, 150);
+        let spiro = await Canvas.loadImage("../images/spirograph.png") // change path
+        context.drawImage(spiro, 0, 0, 150, 150);
         context.fillText(player.energy, 75, 75);
-        Canvas.loadImage("../images/hearts.png") // change path
-            .then((template) => {
-                context.drawImage(template, 350, 350, 150, 150);
-                context.fillText(player.health, 425, 425, 80);
-                context.fillText(player.name, 250, 250, 500);
-                const buffer = canvas.toBuffer("image/png");
-                fs.writeFileSync("./player.png", buffer);
-                console.log("returning");
-                return canvas;
-            }).catch(err => {
-                console.log(err);
-                return 1;
-            });
+        let heart = await Canvas.loadImage("../images/hearts.png") // change path
+        context.drawImage(heart, 350, 350, 150, 150);
+        context.fillText(player.health, 425, 425, 80);
+        context.fillText(player.name, 250, 250, 500);
+        const buffer = canvas.toBuffer("image/png");
+        fs.writeFileSync("./player.png", buffer);
+        console.log("returning");
+        return canvas;
         } catch (err) {
             console.log(err);
             return 1;
