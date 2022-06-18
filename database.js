@@ -4,7 +4,8 @@ const { dbURL } = require('./config.json');
 const { dbName } = require('./config.json');
 const COLLECTIONS = {
     CHARACTER: "characters",
-    CARDS: "cards"
+    CARDS: "cards",
+    DECKS: "decks"
 }
 
 const client = new MongoClient(dbURL);
@@ -105,5 +106,6 @@ module.exports = {
     addCard: async (card) => { return insertDocument(COLLECTIONS.CARDS, card) },
     replaceCard: async (filter, card) => { return replaceDocument(COLLECTIONS.CARDS, filter, card) },
     findCard: async (query) => { return firstDocument(COLLECTIONS.CARDS, query) },
+    findDeck: async (query) => { return firstDocument(COLLECTIONS.DECKS, query)},
     getCardNames: async (query) => { return fetchUnique(COLLECTIONS.CARDS, 'name') }
 }
