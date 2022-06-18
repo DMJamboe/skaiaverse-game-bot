@@ -5,6 +5,7 @@ const db = require('../database');
 class Game {
     constructor(player1, player2) {
         this.players = [new Player(player1), new Player(player2)];
+        this.initDecks();
         this.board = {
             z1: [],
             z2: [],
@@ -13,6 +14,13 @@ class Game {
             z5: []
           }
         this.turn = 1
+    }
+
+    // Initialises players decks
+    async initDecks() {
+        for (var player of this.players) {
+            await player.initDeck();
+        }
     }
 
     // Renders the current game state
@@ -183,10 +191,7 @@ class Game {
     }
 }
 
-async function initDeck() {
-    const profile = await db.findCharacter({userId: this.user});
-    console.log(profile);
-}
+
 
 class Player{
     constructor(user) {
@@ -198,7 +203,20 @@ class Player{
         this.energy = 1;
         this.maxenergy = 1;
         this.health = 25;
-        initDeck(); 
+    }
+
+    async initDeck() {
+        const player = await db.findPlayer({userId: this.user});
+        const character = await db.findCharacter({_id: player.activeCharacter});
+        const deck = await db.findDeck({_id: character.activeDeck});
+        var queries = []
+        for (var cid of deck.cards) {
+            queries.push({_id: cid});
+        }
+        var cards = await db.firstDocumentBatch("cards", queries);
+        this.deck = cards;
+        // Display cards
+        console.log(this.deck);
     }
 
 }
@@ -347,11 +365,10 @@ function renderPlayer(player) {
         });
 }
 
-// Testing
-var u1 = {id: 166294529421344769, username: "Alex"};
-var u2 = {id: 166294529421344769, username: "Sam"};
+// 
+var u1 = {id: "567732334367998004", username: "Alex"};
+var u2 = {id: "567732334367998004", username: "Sam"};
 var game = new Game(u1, u2);
-
 
 module.exports = {
     makeCard: makeCard

@@ -5,7 +5,8 @@ const { dbName } = require('./config.json');
 const COLLECTIONS = {
     CHARACTER: "characters",
     CARDS: "cards",
-    DECKS: "decks"
+    DECKS: "decks",
+    PLAYERS: "players"
 }
 
 const client = new MongoClient(dbURL);
@@ -32,6 +33,24 @@ async function firstDocument(collectionName, query) {
         const coll = db.collection(collectionName);
 
         result = await coll.findOne(query);
+    } finally {
+        await client.close();
+    }
+    return result;
+}
+
+async function firstDocumentBatch(collectionName, queries) {
+    result = [];
+    try {
+        await client.connect();
+
+        const db = client.db(dbName);
+        const coll = db.collection(collectionName);
+
+        for (var query of queries) {
+            let temp = await coll.findOne(query);
+            result.push(temp);
+        }
     } finally {
         await client.close();
     }
@@ -98,6 +117,7 @@ module.exports = {
     COLLECTIONS: COLLECTIONS,
     insertDocument: insertDocument,
     firstDocument: firstDocument,
+    firstDocumentBatch: firstDocumentBatch,
     deleteOneDocument: deleteOneDocument,
     replaceDocument: replaceDocument,
     addCharacter: async (character) => { return insertDocument(COLLECTIONS.CHARACTER, character) },
@@ -106,6 +126,8 @@ module.exports = {
     addCard: async (card) => { return insertDocument(COLLECTIONS.CARDS, card) },
     replaceCard: async (filter, card) => { return replaceDocument(COLLECTIONS.CARDS, filter, card) },
     findCard: async (query) => { return firstDocument(COLLECTIONS.CARDS, query) },
-    findDeck: async (query) => { return firstDocument(COLLECTIONS.DECKS, query)},
+    findDeck: async (query) => { return firstDocument(COLLECTIONS.DECKS, query) },
+    findPlayer: async (query) => { return firstDocument(COLLECTIONS.PLAYERS, query) },
+    retrieveDeck: async (queries) => { return firstDocumentBatch(COLLECTIONS.PLAYERS, queries) },
     getCardNames: async (query) => { return fetchUnique(COLLECTIONS.CARDS, 'name') }
 }
