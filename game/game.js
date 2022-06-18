@@ -284,97 +284,97 @@ async function makeCard(carddata) {
     const canvas = Canvas.createCanvas(500, 500);
     const context = canvas.getContext("2d");
     // Load template from images
-    Canvas.loadImage("./images/" + carddata.aspect + "_Card_Template.jpg")
-        .then((template) => {
-            context.drawImage(template, 0, 0, canvas.width, canvas.height);
-            // Draw title
-            context.textAlign = "right";
-            context.font = 'bold 50px Georgia';
-            context.fillStyle = "#ffffff";
-            context.fillText(carddata.name.toUpperCase(), 478, 55, 330);
-            // Draw classifications
-            context.font = 'bold 36px Georgia';
-            context.fillStyle = "#000000";
-            //let classes = carddata.classes.join(", ");
-            context.fillText(carddata.classification/*.toUpperCase()*/, 478, 92, 330);
-            // Draw energy
+    try {
+        let template = await Canvas.loadImage("./images/" + carddata.aspect + "_Card_Template.jpg")
+        context.drawImage(template, 0, 0, canvas.width, canvas.height);
+        // Draw title
+        context.textAlign = "right";
+        context.font = 'bold 50px Georgia';
+        context.fillStyle = "#ffffff";
+        context.fillText(carddata.name.toUpperCase(), 478, 55, 330);
+        // Draw classifications
+        context.font = 'bold 36px Georgia';
+        context.fillStyle = "#000000";
+        //let classes = carddata.classes.join(", ");
+        context.fillText(carddata.classification/*.toUpperCase()*/, 478, 92, 330);
+        // Draw energy
+        context.font = 'bold 40px Georgia';
+        context.textAlign = "center";
+        context.fillStyle = "#ffffff";
+        context.fillText(carddata.cost, 74, 72, 56);
+        // Draw range
+        context.textBaseline = "middle";
+        if (carddata.range) {
             context.font = 'bold 40px Georgia';
-            context.textAlign = "center";
-            context.fillStyle = "#ffffff";
-            context.fillText(carddata.cost, 74, 72, 56);
-            // Draw range
-            context.textBaseline = "middle";
-            if (carddata.range) {
-                context.font = 'bold 40px Georgia';
-                context.fillStyle = "#5604d9";
-                context.fillText(carddata.range, 437, 437, 46);
-            } else {
-                context.font = 'bold 50px Georgia';
-                // Health
-                context.fillStyle = "#ff0000";
-                context.fillText(carddata.health, 437, 437, 46);
-                // Atk
-                context.fillStyle = "#3a3b3c";
-                context.fillText(carddata.attack, 62, 437, 46);
-            }
+            context.fillStyle = "#5604d9";
+            context.fillText(carddata.range, 437, 437, 46);
+        } else {
+            context.font = 'bold 50px Georgia';
+            // Health
+            context.fillStyle = "#ff0000";
+            context.fillText(carddata.health, 437, 437, 46);
+            // Atk
+            context.fillStyle = "#3a3b3c";
+            context.fillText(carddata.attack, 62, 437, 46);
+        }
 
-            var descSize = 36;
-            var spaceSize = descSize;
-            context.font = descSize + 'px Georgia';
-            context.textAlign = "left";
-            context.fillStyle = "#000000";
-            context.textBaseline = "top";
+        var descSize = 36;
+        var spaceSize = descSize;
+        context.font = descSize + 'px Georgia';
+        context.textAlign = "left";
+        context.fillStyle = "#000000";
+        context.textBaseline = "top";
 
-            // Split descriptions into lines
-            var cont = true;
-            while (cont) {
-                const boxSize = 419;
-                var coords = [40, 120];
-                var desc = carddata.text;
-                var descArray = desc.split(" ");
-                var lines = [];
-                var currentLine = "";
-                console.log(descArray);
-                // Splits each line when it would overflow the box
-                while (descArray.length != 0) {
-                    var nextWord = descArray.shift();
-                    var newLine = currentLine.concat(" ", nextWord);
-                    if (context.measureText(newLine).width > boxSize) {
-                        if (currentLine == "") {
-                            break;
-                        }
-                        lines.push(currentLine.trim());
-                        descArray.unshift(nextWord);
-                        currentLine = "";
-                    } else {
-                        currentLine = newLine;
+        // Split descriptions into lines
+        var cont = true;
+        while (cont) {
+            const boxSize = 419;
+            var coords = [40, 120];
+            var desc = carddata.text;
+            var descArray = desc.split(" ");
+            var lines = [];
+            var currentLine = "";
+            console.log(descArray);
+            // Splits each line when it would overflow the box
+            while (descArray.length != 0) {
+                var nextWord = descArray.shift();
+                var newLine = currentLine.concat(" ", nextWord);
+                if (context.measureText(newLine).width > boxSize) {
+                    if (currentLine == "") {
+                        break;
                     }
-                }
-                lines.push(currentLine.trim());
-                console.log(lines.length);
-                // Checks whether the lines fit in the box vertically
-                if (lines.length > (boxSize / descSize) / 2) {
-                    descSize = descSize-1;
-                    context.font = descSize + 'px Georgia';
-                    spaceSize = descSize;
-                } else { 
-                    cont = false;
+                    lines.push(currentLine.trim());
+                    descArray.unshift(nextWord);
+                    currentLine = "";
+                } else {
+                    currentLine = newLine;
                 }
             }
-
-            // Writes to image
-            for (var line of lines) {
-                context.fillText(line, coords[0], coords[1]);
-                coords[1] += spaceSize;
+            lines.push(currentLine.trim());
+            console.log(lines.length);
+            // Checks whether the lines fit in the box vertically
+            if (lines.length > (boxSize / descSize) / 2) {
+                descSize = descSize-1;
+                context.font = descSize + 'px Georgia';
+                spaceSize = descSize;
+            } else { 
+                cont = false;
             }
+        }
 
-            const buffer = canvas.toBuffer("image/png");
-            fs.writeFileSync("./test.png", buffer);
-            return canvas;
-        }).catch(err => {
-            console.log(err);
-            return 1;
-        })
+        // Writes to image
+        for (var line of lines) {
+            context.fillText(line, coords[0], coords[1]);
+            coords[1] += spaceSize;
+        }
+
+        const buffer = canvas.toBuffer("image/png");
+        fs.writeFileSync("./test.png", buffer);
+        return canvas;
+    } catch (err) {
+        console.log(err);
+        return 1;
+    }
 }
 
 // Renders player as a card
@@ -387,27 +387,27 @@ async function renderPlayer(player) {
     context.fillStyle = "#ffffff";
     context.fillRect(0, 0, 500 , 500);
     context.fillStyle = "#000000";
-    Canvas.loadImage("../images/spirograph.png") // change path
-        .then((template) => {
-            context.drawImage(template, 0, 0, 150, 150);
-            context.fillText(player.energy, 75, 75);
-            Canvas.loadImage("../images/hearts.png") // change path
-                .then((template) => {
-                    context.drawImage(template, 350, 350, 150, 150);
-                    context.fillText(player.health, 425, 425, 80);
-                    context.fillText(player.name, 250, 250, 500);
-                    const buffer = canvas.toBuffer("image/png");
-                    fs.writeFileSync("./player.png", buffer);
-                    console.log("returning");
-                    return canvas;
-                }).catch(err => {
-                    console.log(err);
-                    return 1;
-                });
-        }).catch(err => {
+    try {
+        let template = await Canvas.loadImage("../images/spirograph.png") // change path
+        context.drawImage(template, 0, 0, 150, 150);
+        context.fillText(player.energy, 75, 75);
+        Canvas.loadImage("../images/hearts.png") // change path
+            .then((template) => {
+                context.drawImage(template, 350, 350, 150, 150);
+                context.fillText(player.health, 425, 425, 80);
+                context.fillText(player.name, 250, 250, 500);
+                const buffer = canvas.toBuffer("image/png");
+                fs.writeFileSync("./player.png", buffer);
+                console.log("returning");
+                return canvas;
+            }).catch(err => {
+                console.log(err);
+                return 1;
+            });
+        } catch (err) {
             console.log(err);
             return 1;
-        });
+        };
 }
 
 // 
