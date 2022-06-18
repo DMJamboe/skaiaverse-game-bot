@@ -1,5 +1,6 @@
 const Canvas = require('canvas');
-const fs = require('fs')
+const fs = require('fs');
+const db = require('../database');
 
 class Game {
     constructor(player1, player2) {
@@ -12,6 +13,11 @@ class Game {
             z5: []
           }
         this.turn = 1
+    }
+
+    // Renders the current game state
+    renderGame() {
+
     }
 
     // Method to draw from deck
@@ -177,6 +183,11 @@ class Game {
     }
 }
 
+async function initDeck() {
+    const profile = await db.findCharacter({userId: this.user});
+    console.log(profile);
+}
+
 class Player{
     constructor(user) {
         this.user = user.id;
@@ -187,7 +198,9 @@ class Player{
         this.energy = 1;
         this.maxenergy = 1;
         this.health = 25;
+        initDeck(); 
     }
+
 }
 
 /* Randomize array in-place using Durstenfeld shuffle algorithm */
@@ -295,35 +308,50 @@ function makeCard(carddata) {
 
             const buffer = canvas.toBuffer("image/png");
             fs.writeFileSync("./test.png", buffer);
+            return canvas;
         }).catch(err => {
             console.log(err);
             return 1;
         })
 }
 
-/* Testing
-var u1 = {id: 123, username: "Alex"};
-var u2 = {id: 274, username: "Sam"};
+// Renders player as a card
+function renderPlayer(player) {
+    const canvas = Canvas.createCanvas(500, 500);
+    const context = canvas.getContext("2d");
+    context.textAlign = "center";
+    context.textBaseline = "middle";
+    context.font = 'bold 70px Georgia';
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, 500 , 500);
+    context.fillStyle = "#000000";
+    Canvas.loadImage("../images/spirograph.png") // change path
+        .then((template) => {
+            context.drawImage(template, 0, 0, 150, 150);
+            context.fillText(player.energy, 75, 75);
+            Canvas.loadImage("../images/hearts.png") // change path
+                .then((template) => {
+                    context.drawImage(template, 350, 350, 150, 150);
+                    context.fillText(player.health, 425, 425, 80);
+                    context.fillText(player.name, 250, 250, 500);
+                    const buffer = canvas.toBuffer("image/png");
+                    fs.writeFileSync("./player.png", buffer);
+                    return canvas;
+                }).catch(err => {
+                    console.log(err);
+                    return 1;
+                });
+        }).catch(err => {
+            console.log(err);
+            return 1;
+        });
+}
+
+// Testing
+var u1 = {id: 166294529421344769, username: "Alex"};
+var u2 = {id: 166294529421344769, username: "Sam"};
 var game = new Game(u1, u2);
-game.players[0].deck = ["Flume Knight", "Toothpaste", "Teleport", "Swift Attack", "Atrioc's Gambit"];
-// Testing draw
-game.draw(123);
-game.draw(123);
-console.log(game.players[0]);
-// Testing play to board
-console.log(game.playToBoard(123, "Swift Attack", "z2"));
-console.log(game.playToBoard(321, "Swift Attack", "z2"));
-console.log(game.playToBoard(274, "Swift Attack", "z2"));
-console.log(game.players[0]);
-console.log(game.board);
-// Testing play as spell
-console.log(game.playSpell(123, "Atrioc's Gambit"));
-console.log(game.players[0]);
-// Testing shuffle
-console.log(game.players[0]);
-game.shuffle(123);
-console.log(game.players[0]);
-*/
+
 
 module.exports = {
     makeCard: makeCard
