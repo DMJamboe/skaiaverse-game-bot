@@ -5,27 +5,63 @@ const db = require('../database');
 class Game {
     constructor(player1, player2) {
         this.players = [new Player(player1), new Player(player2)];
-        this.initDecks();
         this.board = {
             z1: [],
-            z2: [],
+            z2: [this.players[0]],
             z3: [],
-            z4: [],
+            z4: [this.players[1]],
             z5: []
           }
-        this.turn = 1
+        this.turn = 1;
+        this.init();
+        this.renderGame();
     }
 
-    // Initialises players decks
-    async initDecks() {
+    // Initialises the game
+    async init() {
+        // Initialises each player
         for (var player of this.players) {
-            await player.initDeck();
+            await player.init();
         }
     }
 
     // Renders the current game state
-    renderGame() {
-
+    async renderGame() {
+        const canvas = Canvas.createCanvas(1000, 1200);
+        const context = canvas.getContext("2d");
+        const zones = {z1: 70, z2: 290, z3: 510, z4: 730, z5: 950};
+        const baseX = 20;
+        const xScale = 220;
+        // Load template from images
+        Canvas.loadImage("../images/chesse.png")
+            .then(async (template) => {
+                context.drawImage(template, 0, 0, canvas.width, canvas.height);
+                context.fillStyle = "white";
+                context.fillRect(0, 0, 1000, 50);
+                context.fillRect(0, 1150, 1000, 50);
+                for (const [zone, cards] of Object.entries(this.board)) {
+                    console.log(1);
+                    var x = baseX;
+                    for (var card of cards) {
+                        if (card.constructor.name == "Player") {
+                            var img = renderPlayer(card);
+                        } else {
+                            var img = makeCard(card);
+                        }
+                        img.then((result) => {
+                            console.log(result);
+                            context.drawImage(result, x, zones[zone], 200, 200);
+                            x += xScale;
+                        });
+                    }
+                }
+                const buffer = canvas.toBuffer("image/png");
+                fs.writeFileSync("./board.png", buffer);
+                return canvas;
+            }).catch(err => {
+                console.log(err);
+                return 1;
+            })
     }
 
     // Method to draw from deck
@@ -205,7 +241,8 @@ class Player{
         this.health = 25;
     }
 
-    async initDeck() {
+    // Initialises a player by getting their active deck and drawing their hand
+    async init() {
         const player = await db.findPlayer({userId: this.user});
         const character = await db.findCharacter({_id: player.activeCharacter});
         const deck = await db.findDeck({_id: character.activeDeck});
@@ -215,8 +252,15 @@ class Player{
         }
         var cards = await db.firstDocumentBatch("cards", queries);
         this.deck = cards;
-        // Display cards
-        console.log(this.deck);
+        
+        // Shuffle then put 5 cards into hand
+        this.deck = shuffleArray(this.deck);
+
+        // Draw from top 5 times
+        for (let i = 0; i < 5; i++) {
+            let c = this.deck.pop();
+            this.hand.push(c);
+        }
     }
 
 }
@@ -236,7 +280,7 @@ function shuffleArray(array) {
 
 // Generate a card based on its json
 // TODO: add way to vertically squash long descriptions
-function makeCard(carddata) {
+async function makeCard(carddata) {
     const canvas = Canvas.createCanvas(500, 500);
     const context = canvas.getContext("2d");
     // Load template from images
@@ -334,7 +378,7 @@ function makeCard(carddata) {
 }
 
 // Renders player as a card
-function renderPlayer(player) {
+async function renderPlayer(player) {
     const canvas = Canvas.createCanvas(500, 500);
     const context = canvas.getContext("2d");
     context.textAlign = "center";
@@ -354,6 +398,7 @@ function renderPlayer(player) {
                     context.fillText(player.name, 250, 250, 500);
                     const buffer = canvas.toBuffer("image/png");
                     fs.writeFileSync("./player.png", buffer);
+                    console.log("returning");
                     return canvas;
                 }).catch(err => {
                     console.log(err);
@@ -369,6 +414,7 @@ function renderPlayer(player) {
 var u1 = {id: "567732334367998004", username: "Alex"};
 var u2 = {id: "567732334367998004", username: "Sam"};
 var game = new Game(u1, u2);
+//console.log(game.players[0].constructor.name);
 
 module.exports = {
     makeCard: makeCard
