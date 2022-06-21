@@ -27,21 +27,34 @@ class Game {
 
     // Renders the current game state
     async renderGame() {
-        const canvas = Canvas.createCanvas(1000, 1200);
+        // First check size
+        let maxCards = 0;
+        let xLength = 1200;
+        for (const [zone, cards] of Object.entries(this.board)) {
+            if (cards.length > maxCards) {
+                maxCards = cards.length;
+            }
+        }
+        if (maxCards > 4) {
+            xLength = 20 + 20 + 220*maxCards;
+        }
+        const canvas = Canvas.createCanvas(xLength, 1200);
         const context = canvas.getContext("2d");
         const zones = {z1: 70, z2: 290, z3: 510, z4: 730, z5: 950};
         const baseX = 20;
         const xScale = 220;
+        const cardSize = 200;
+        
         // Load template from images
         Canvas.loadImage("./images/chesse.png")
             .then(async (template) => {
                 context.drawImage(template, 0, 0, canvas.width, canvas.height);
                 context.fillStyle = "white";
-                context.fillRect(0, 0, 1000, 50);
-                context.fillRect(0, 1150, 1000, 50);
+                context.fillRect(0, 0, canvas.width, 50);
+                context.fillRect(0, 1150, canvas.width, 50);
                 context.lineWidth = 2;
-                context.strokeRect(0, 50, 1000, 0);
-                context.strokeRect(0, 1150, 1000, 0);
+                context.strokeRect(0, 50, canvas.width, 0);
+                context.strokeRect(0, 1150, canvas.width, 0);
                 for (const [zone, cards] of Object.entries(this.board)) {
                     var x = baseX;
                     for (var card of cards) {
@@ -50,11 +63,18 @@ class Game {
                         } else {
                             var img = await makeCard(card);
                         }
-                        context.drawImage(img, x, zones[zone], 200, 200);
-                        context.strokeRect(x, zones[zone], 200, 200);
+                        context.drawImage(img, x, zones[zone], cardSize, cardSize);
+                        context.strokeRect(x, zones[zone], cardSize, cardSize);
                         x += xScale;
                     }
                 }
+                
+
+                // Write text
+                context.fillStyle = "black";
+                context.font = "36px bold georgia";
+                context.fillText(this.players[0].name, 20, 36, 800);
+                context.fillText(this.players[1].name, 20, 1186, 800);
                 const buffer = canvas.toBuffer("image/png");
                 fs.writeFileSync("./board.png", buffer);
                 console.log("rendered");
@@ -412,11 +432,14 @@ let u2 = {id: "567732334367998004", username: "Sam"};
 let game = new Game(u1, u2);
 game.init().then(() => {
     console.log(game.players[1].hand[1]);
-    console.log(game.playToBoard("567732334367998004", game.players[1].hand[1].name, "z2"));
-    console.log(game.playToBoard("567732334367998004", game.players[1].hand[1].name, "z2"));
+    console.log(game.playToBoard("567732334367998004", game.players[1].hand[0].name, "z2"));
+    console.log(game.playToBoard("567732334367998004", game.players[1].hand[0].name, "z2"));
+    console.log(game.playToBoard("567732334367998004", game.players[1].hand[0].name, "z2"));
+    console.log(game.playToBoard("567732334367998004", game.players[1].hand[0].name, "z2"));
+    console.log(game.playToBoard("567732334367998004", game.players[1].hand[0].name, "z2"));
     game.renderGame();
-});*/
-
+});
+*/
 
 module.exports = {
     makeCard: makeCard
