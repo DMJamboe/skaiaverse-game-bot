@@ -10,5 +10,9 @@
     "Heart": { "colour": "#c27ba0", "icon": "heart.png", "title": "#ffffff", "text": "#000000" },
     "Space": { "colour": "#073763", "icon": "space.png", "title": "#ffffff", "text": "#000000" },
     "Time": { "colour": "#85200c", "icon": "time.png", "title": "#ffffff", "text": "#000000" },
-    "Void": { "colour": "#20124d", "icon": "void.png", "title": "#ffffff", "text": "#000000" }
+    "Void": { "colour": "#20124d", "icon": "void.png", "title": "#ffffff", "text": "#000000" },
+    "EnergyColour": "white",
+    "AttackColour": "#3a3b3c",
+    "HealthColour": "#ff0000",
+    "RangeColour": "#5604d9"
 }

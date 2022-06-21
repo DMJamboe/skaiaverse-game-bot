@@ -33,7 +33,7 @@ class Game {
         const baseX = 20;
         const xScale = 220;
         // Load template from images
-        Canvas.loadImage("../images/chesse.png")
+        Canvas.loadImage("./images/chesse.png")
             .then(async (template) => {
                 context.drawImage(template, 0, 0, canvas.width, canvas.height);
                 context.fillStyle = "white";
@@ -43,7 +43,6 @@ class Game {
                 context.strokeRect(0, 50, 1000, 0);
                 context.strokeRect(0, 1150, 1000, 0);
                 for (const [zone, cards] of Object.entries(this.board)) {
-                    console.log(1);
                     var x = baseX;
                     for (var card of cards) {
                         if (card.constructor.name == "Player") {
@@ -116,8 +115,6 @@ class Game {
         for (var card of player.hand) {
             // TEMPORARY CHANGE FOR TESTING CARDS
             //if (cardname == card.name) { 
-            console.log(cardname);
-            console.log(card.name);
             if (cardname == card.name) {
                 selectedCard = card;
                 index = player.hand.indexOf(card);
@@ -290,36 +287,38 @@ async function makeCard(carddata) {
     const context = canvas.getContext("2d");
     // Load template from images
     try {
-        let template = await Canvas.loadImage("./images/" + carddata.aspect + "_Card_Template.jpg")
+        const themesFile = fs.readFileSync("./themes.json"); 
+        const themes = JSON.parse(themesFile);
+        let template = await Canvas.loadImage("./images/" + carddata.aspect + "_Card_Template.jpg");
         context.drawImage(template, 0, 0, canvas.width, canvas.height);
         // Draw title
         context.textAlign = "right";
         context.font = 'bold 50px Georgia';
-        context.fillStyle = "#ffffff";
+        context.fillStyle = themes[carddata.aspect].title;
         context.fillText(carddata.name.toUpperCase(), 478, 55, 330);
         // Draw classifications
         context.font = 'bold 36px Georgia';
-        context.fillStyle = "#000000";
+        context.fillStyle = themes[carddata.aspect].text;
         //let classes = carddata.classes.join(", ");
         context.fillText(carddata.classification/*.toUpperCase()*/, 478, 92, 330);
         // Draw energy
         context.font = 'bold 40px Georgia';
         context.textAlign = "center";
-        context.fillStyle = "#ffffff";
+        context.fillStyle = themes.EnergyColour;
         context.fillText(carddata.cost, 74, 72, 56);
         // Draw range
         context.textBaseline = "middle";
         if (carddata.range) {
             context.font = 'bold 40px Georgia';
-            context.fillStyle = "#5604d9";
+            context.fillStyle = themes.RangeColour;
             context.fillText(carddata.range, 437, 437, 46);
         } else {
             context.font = 'bold 50px Georgia';
             // Health
-            context.fillStyle = "#ff0000";
+            context.fillStyle = themes.HealthColour;
             context.fillText(carddata.health, 437, 437, 46);
             // Atk
-            context.fillStyle = "#3a3b3c";
+            context.fillStyle = themes.AttackColour;
             context.fillText(carddata.attack, 62, 437, 46);
         }
 
@@ -327,7 +326,7 @@ async function makeCard(carddata) {
         var spaceSize = descSize;
         context.font = descSize + 'px Georgia';
         context.textAlign = "left";
-        context.fillStyle = "#000000";
+        context.fillStyle = themes[carddata.aspect].text;
         context.textBaseline = "top";
 
         // Split descriptions into lines
@@ -339,7 +338,6 @@ async function makeCard(carddata) {
             var descArray = desc.split(" ");
             var lines = [];
             var currentLine = "";
-            console.log(descArray);
             // Splits each line when it would overflow the box
             while (descArray.length != 0) {
                 var nextWord = descArray.shift();
@@ -356,7 +354,6 @@ async function makeCard(carddata) {
                 }
             }
             lines.push(currentLine.trim());
-            console.log(lines.length);
             // Checks whether the lines fit in the box vertically
             if (lines.length > (boxSize / descSize) / 2) {
                 descSize = descSize-1;
@@ -393,16 +390,15 @@ async function renderPlayer(player) {
     context.fillRect(0, 0, 500 , 500);
     context.fillStyle = "#000000";
     try {
-        let spiro = await Canvas.loadImage("../images/spirograph.png") // change path
+        let spiro = await Canvas.loadImage("./images/spirograph.png") // change path
         context.drawImage(spiro, 0, 0, 150, 150);
         context.fillText(player.energy, 75, 75);
-        let heart = await Canvas.loadImage("../images/hearts.png") // change path
+        let heart = await Canvas.loadImage("./images/hearts.png") // change path
         context.drawImage(heart, 350, 350, 150, 150);
         context.fillText(player.health, 425, 425, 80);
         context.fillText(player.name, 250, 250, 500);
         const buffer = canvas.toBuffer("image/png");
         fs.writeFileSync("./player.png", buffer);
-        console.log("returning");
         return canvas;
         } catch (err) {
             console.log(err);
@@ -416,6 +412,7 @@ let u2 = {id: "567732334367998004", username: "Sam"};
 let game = new Game(u1, u2);
 game.init().then(() => {
     console.log(game.players[1].hand[1]);
+    console.log(game.playToBoard("567732334367998004", game.players[1].hand[1].name, "z2"));
     console.log(game.playToBoard("567732334367998004", game.players[1].hand[1].name, "z2"));
     game.renderGame();
 });*/
