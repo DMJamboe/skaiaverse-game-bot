@@ -61,7 +61,7 @@ class Game {
                         if (card.constructor.name == "Player") {
                             var img = await renderPlayer(card);
                         } else {
-                            var img = await makeCard(card);
+                            var img = await makeCard(card, true);
                         }
                         context.drawImage(img, x, zones[zone], cardSize, cardSize);
                         context.strokeRect(x, zones[zone], cardSize, cardSize);
@@ -150,6 +150,11 @@ class Game {
         player.hand.splice(index, 1);
         // Pushes card to board
         this.board[zone].push(selectedCard);
+
+        // Sets currentHealth and currentAttack
+        selectedCard.currentHealth = 0;
+        selectedCard.currentAttack = 0;
+        selectedCard.tapped = true;
 
         return 0;
     }
@@ -301,8 +306,9 @@ function shuffleArray(array) {
 }
 
 // Generate a card based on its json
-// TODO: add way to vertically squash long descriptions
-async function makeCard(carddata) {
+// carddata - a card object
+// onBoard - bool - whether the rendering is for a card in play or not
+async function makeCard(carddata, onBoard) {
     const canvas = Canvas.createCanvas(500, 500);
     const context = canvas.getContext("2d");
     // Load template from images
@@ -310,6 +316,7 @@ async function makeCard(carddata) {
         const themesFile = fs.readFileSync("./themes.json"); 
         const themes = JSON.parse(themesFile);
         let template = await Canvas.loadImage("./images/" + carddata.aspect + "_Card_Template.jpg");
+
         context.drawImage(template, 0, 0, canvas.width, canvas.height);
         // Draw title
         context.textAlign = "right";
@@ -336,10 +343,10 @@ async function makeCard(carddata) {
             context.font = 'bold 50px Georgia';
             // Health
             context.fillStyle = themes.HealthColour;
-            context.fillText(carddata.health, 437, 437, 46);
+            context.fillText(onBoard ? carddata.currentHealth : carddata.health, 437, 437, 46);
             // Atk
             context.fillStyle = themes.AttackColour;
-            context.fillText(carddata.attack, 62, 437, 46);
+            context.fillText(onBoard ? carddata.currentAttack : carddata.attack, 62, 437, 46);
         }
 
         var descSize = 36;
@@ -390,6 +397,22 @@ async function makeCard(carddata) {
             coords[1] += spaceSize;
         }
 
+        // Convert to greyscale if tapped
+        if (!carddata.tapped) {
+            const id = context.getImageData(0, 0, canvas.width, canvas.height);
+            const data = id.data;
+            for (let i = 0; i < data.length; i += 4) {
+                let r = data[i];
+                let g = data[i + 1];
+                let b = data[i + 2];
+                let y = 0.299 * r + 0.587 * g + 0.114 * b;
+                data[i] = y;
+                data[i + 1] = y;
+                data[i + 2] = y;
+            }
+            context.putImageData(id, 0, 0);
+        }
+
         const buffer = canvas.toBuffer("image/png");
         fs.writeFileSync("./test.png", buffer);
         return canvas;
@@ -426,7 +449,7 @@ async function renderPlayer(player) {
         };
 }
 
-/*
+
 let u1 = {id: "567732334367998004", username: "Alex"};
 let u2 = {id: "567732334367998004", username: "Sam"};
 let game = new Game(u1, u2);
@@ -439,7 +462,7 @@ game.init().then(() => {
     console.log(game.playToBoard("567732334367998004", game.players[1].hand[0].name, "z2"));
     game.renderGame();
 });
-*/
+
 
 module.exports = {
     makeCard: makeCard
